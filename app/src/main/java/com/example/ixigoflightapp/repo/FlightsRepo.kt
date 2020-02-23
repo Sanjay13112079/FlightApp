@@ -20,10 +20,10 @@ class FlightsRepo {
         val output=MutableLiveData<Resource<FlightsData?>>()
           output.value=Resource.loading(null)
 
-                var client = OkHttpClient.Builder().addInterceptor(HttpLoggingInterceptor()).build()
+                var client = UnsafeCertificate.getUnsafeOkHttpClient()
 
                 var retrofit= Retrofit.Builder()
-                    .baseUrl("http://www.mocky.io/v2/5979c6731100001e039edcb3/")
+                    .baseUrl("https://www.mocky.io/v2/5979c6731100001e039edcb3/")
                     .addConverterFactory(GsonConverterFactory.create(Gson()))
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.createAsync()) // using retrofit with rxJava
                     .client(client).build()

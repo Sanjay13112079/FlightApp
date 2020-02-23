@@ -14,7 +14,7 @@ class FlightsActivity : AppCompatActivity() {
 
     fun naigateToFlightsFrgament()
     {
-        var frgament= FlightsListFragment()
+        var frgament= FlightsListFragment() 
         supportFragmentManager?.beginTransaction()?.add(R.id.container,frgament)?.commit()
     }
 

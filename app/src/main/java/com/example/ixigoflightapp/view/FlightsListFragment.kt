@@ -45,7 +45,7 @@ class FlightsListFragment :Fragment(),View.OnClickListener {
         flights_rv.adapter=mAdapter
 
         var sortList= arrayOf(resources.getString(R.string.filter_here),resources.getString(R.string.low_to_high), resources.getString(R.string.high_to_low))
-        var spinnerAdapter=ArrayAdapter<String>(activity, android.R.layout.simple_spinner_dropdown_item,sortList);
+        var spinnerAdapter=ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item,sortList);
         sort_spinner?.adapter=spinnerAdapter
         sort_spinner.onItemSelectedListener=spinnerSelectionListener
 
@@ -59,11 +59,11 @@ class FlightsListFragment :Fragment(),View.OnClickListener {
             when(it.status)
             {
                 Status.LOADING ->{
-                    //loading can be shown
+                    showView(false)
                 }
 
                 Status.ERROR ->{
-                    //error handle
+                    showView(false)
                 }
 
                 Status.SUCCESS ->{
@@ -80,18 +80,11 @@ class FlightsListFragment :Fragment(),View.OnClickListener {
     {
         if(data==null || data.flights==null || data.flights.isEmpty())
         {
-            trip_route.visibility=View.GONE
-            trip_date.visibility=View.GONE
-            divider.visibility=View.GONE
-            sort_spinner?.visibility=View.GONE
-
+            showView(false)
             return
         }
 
-        trip_route.visibility=View.VISIBLE
-        trip_date.visibility=View.VISIBLE
-        divider.visibility=View.VISIBLE
-        sort_spinner?.visibility=View.VISIBLE
+        showView(true)
 
 
         trip_route?.text=resources.getString(R.string.delhi_to_bombay)
@@ -125,6 +118,23 @@ class FlightsListFragment :Fragment(),View.OnClickListener {
             }
 
             mAdapter.notifyDataSetChanged()
+        }
+    }
+
+    fun showView(isShow :Boolean)
+    {
+        if(isShow) {
+            trip_route.visibility = View.VISIBLE
+            trip_date.visibility = View.VISIBLE
+            divider.visibility = View.VISIBLE
+            sort_spinner?.visibility = View.VISIBLE
+        }
+        else
+        {
+            trip_route.visibility = View.GONE
+            trip_date.visibility = View.GONE
+            divider.visibility = View.GONE
+            sort_spinner?.visibility = View.GONE
         }
     }
 
