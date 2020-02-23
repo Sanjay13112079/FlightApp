@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">IxigoFlightApp</string>
+    <string name="delhi_to_bombay">Delhi to Bombay </string>
+    <string name="filter_here">filter here </string>
+    <string name="low_to_high">low to high </string>
+    <string name="high_to_low">high to low </string>
+
+</resources>
