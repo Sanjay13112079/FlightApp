@@ -17,16 +17,26 @@ import com.example.ixigoflightapp.data.FlightsData
 import com.example.ixigoflightapp.data.Resource
 import com.example.ixigoflightapp.data.Status
 import com.example.ixigoflightapp.viewmodel.FlightsVM
-import kotlinx.android.synthetic.main.flights_list_fragment.*
+import kotlinx.android.synthetic.main.fragment_flight_list.*
 
-class FlightsListFragment :Fragment(),View.OnClickListener {
+class FlightsListFragment : Fragment(), View.OnClickListener {
 
-    lateinit var viewModel : FlightsVM
-    lateinit var feedItemList :ArrayList<FeedItem<*>>
-    lateinit var mAdapter :GenericRVAdapter
+    lateinit var viewModel: FlightsVM
+    lateinit var feedItemList: ArrayList<FeedItem<*>>
+    lateinit var mAdapter: GenericRVAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.flights_list_fragment,container,false)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        viewModel = ViewModelProviders.of(this).get(FlightsVM::class.java)
+        feedItemList = ArrayList()
+        super.onCreate(savedInstanceState)
+    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_flight_list, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -35,39 +45,42 @@ class FlightsListFragment :Fragment(),View.OnClickListener {
         fetchData()
     }
 
-    fun initViews()
-    {
-        viewModel= ViewModelProviders.of(this).get(FlightsVM::class.java)
-        feedItemList=ArrayList()
-        mAdapter=GenericRVAdapter(feedItemList,this)
-        var layoutmanager=LinearLayoutManager(activity)
-        flights_rv.layoutManager=layoutmanager
-        flights_rv.adapter=mAdapter
+    private fun initViews() {
+        mAdapter = GenericRVAdapter(feedItemList, this)
+        flights_rv.layoutManager = LinearLayoutManager(activity)
+        flights_rv.adapter = mAdapter
 
-        var sortList= arrayOf(resources.getString(R.string.filter_here),resources.getString(R.string.low_to_high), resources.getString(R.string.high_to_low))
-        var spinnerAdapter=ArrayAdapter<String>(activity!!, android.R.layout.simple_spinner_dropdown_item,sortList);
-        sort_spinner?.adapter=spinnerAdapter
-        sort_spinner.onItemSelectedListener=spinnerSelectionListener
+        val sortList = arrayOf(
+            resources.getString(R.string.filter_here),
+            resources.getString(R.string.low_to_high),
+            resources.getString(R.string.high_to_low)
+        )
+        val spinnerAdapter = ArrayAdapter<String>(
+            requireActivity(),
+            android.R.layout.simple_spinner_dropdown_item,
+            sortList
+        );
+        sort_spinner?.adapter = spinnerAdapter
+        sort_spinner.onItemSelectedListener = spinnerSelectionListener
 
     }
 
     /**
      * Trigger for API
      */
-    fun fetchData(){
-        viewModel.fetchData()?.observe(this,Observer<Resource<FlightsData?>>{
-            when(it.status)
-            {
-                Status.LOADING ->{
+    private fun fetchData() {
+        viewModel.fetchData().observe(this, Observer<Resource<FlightsData?>> {
+            when (it.status) {
+                Status.LOADING -> {
                     showView(false)
                 }
 
-                Status.ERROR ->{
+                Status.ERROR -> {
                     showView(false)
                 }
 
-                Status.SUCCESS ->{
-                   mapDatatUI(it.data)
+                Status.SUCCESS -> {
+                    mapDatatUI(it.data)
                 }
             }
         })
@@ -76,23 +89,19 @@ class FlightsListFragment :Fragment(),View.OnClickListener {
     /**
      * map the receieved data to UI
      */
-    fun mapDatatUI(data :FlightsData?)
-    {
-        if(data==null || data.flights==null || data.flights.isEmpty())
-        {
+    private fun mapDatatUI(data: FlightsData?) {
+        if (data?.flights == null || data.flights.isEmpty()) {
             showView(false)
             return
         }
 
         showView(true)
 
+        trip_route?.text = resources.getString(R.string.delhi_to_bombay)
+        trip_date?.text = viewModel.getDate(data)
 
-        trip_route?.text=resources.getString(R.string.delhi_to_bombay)
-        trip_date?.text=viewModel.getDate(data)
-
-        feedItemList?.addAll(viewModel.getFlightsDetailsFeedItemList(data)!!)
+        feedItemList.addAll(viewModel.getFlightsDetailsFeedItemList(data)!!)
         mAdapter.notifyDataSetChanged()
-
 
 
     }
@@ -100,37 +109,39 @@ class FlightsListFragment :Fragment(),View.OnClickListener {
     /**
      * spinner item click control
      */
-    var spinnerSelectionListener=object : AdapterView.OnItemSelectedListener{
-        override fun onNothingSelected(parent: AdapterView<*>?) {}
+    var spinnerSelectionListener: AdapterView.OnItemSelectedListener =
+        object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
 
-        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
 
-            feedItemList.clear()
+                feedItemList.clear()
 
-            when(position)
-            {
-                0 -> feedItemList.addAll(viewModel.flighsFeedItemList)
+                when (position) {
+                    0 -> feedItemList.addAll(viewModel.flighsFeedItemList)
 
-                1 -> feedItemList.addAll(viewModel.doSorting(1))
+                    1 -> feedItemList.addAll(viewModel.doSorting(1))
 
-                2 -> feedItemList.addAll(viewModel.doSorting(2))
+                    2 -> feedItemList.addAll(viewModel.doSorting(2))
 
+                }
+
+                mAdapter.notifyDataSetChanged()
             }
-
-            mAdapter.notifyDataSetChanged()
         }
-    }
 
-    fun showView(isShow :Boolean)
-    {
-        if(isShow) {
+    private fun showView(isShow: Boolean) {
+        if (isShow) {
             trip_route.visibility = View.VISIBLE
             trip_date.visibility = View.VISIBLE
             divider.visibility = View.VISIBLE
             sort_spinner?.visibility = View.VISIBLE
-        }
-        else
-        {
+        } else {
             trip_route.visibility = View.GONE
             trip_date.visibility = View.GONE
             divider.visibility = View.GONE

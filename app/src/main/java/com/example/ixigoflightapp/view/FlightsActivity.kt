@@ -1,7 +1,7 @@
 package com.example.ixigoflightapp.view
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.ixigoflightapp.R
 
 class FlightsActivity : AppCompatActivity() {
@@ -12,10 +12,9 @@ class FlightsActivity : AppCompatActivity() {
         naigateToFlightsFrgament()
     }
 
-    fun naigateToFlightsFrgament()
-    {
-        var frgament= FlightsListFragment() 
-        supportFragmentManager?.beginTransaction()?.add(R.id.container,frgament)?.commit()
+    private fun naigateToFlightsFrgament() {
+        val frgament = FlightsListFragment()
+        supportFragmentManager.beginTransaction().add(R.id.container, frgament).commit()
     }
 
 }
